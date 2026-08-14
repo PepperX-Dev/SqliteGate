@@ -1,0 +1,67 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore SqliteGate.slnx
+
+    - name: Build
+      run: dotnet build SqliteGate.slnx -c Release --no-restore
+
+    # The concurrency suites are the point of this repository, so they run on every push rather than
+    # being held back for a nightly. They need no services: the database under test is a file the
+    # suite creates in a temporary directory and deletes afterwards.
+    - name: Test
+      run: >-
+        dotnet test SqliteGate.slnx -c Release --no-build --verbosity normal
+        --collect:"XPlat Code Coverage"
+        --results-directory ./coverage
+
+    - name: Upload coverage
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage
+        path: ./coverage/**/coverage.cobertura.xml
+        if-no-files-found: warn
+
+  # Packing on every push catches the packaging-only mistakes — a missing icon, a README that did not
+  # make it into the .nupkg — at the commit that caused them rather than at the release tag.
+  pack-check:
+    name: Verify packaging
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Pack
+      run: dotnet pack SqliteGate.slnx -c Release -o ./nupkgs -p:ContinuousIntegrationBuild=true
+
+    - name: List produced packages
+      run: ls -la ./nupkgs

@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <PackageId>PepperX.SqliteGate</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Amir Hossein Morady Pour</Authors>
+    <Description>Stop "database is locked" (SQLITE_BUSY) in multi-threaded .NET apps. SQLite allows many readers but only one writer, and ADO.NET opens connections that know nothing about each other — so two concurrent requests against one .db file means one of them fails. SqliteGate puts a single-writer queue in front of each database file: writes wait their turn, reads never block, and you configure nothing. WAL, busy_timeout, synchronous and foreign_keys are applied automatically to every connection (not just the first); residual contention is retried with exponential backoff and jitter; queue depth, wait time and retry counts are published through System.Diagnostics.Metrics. This package is the core engine and the raw ADO.NET API, built directly on Microsoft.Data.Sqlite. Using Dapper or EF Core instead? Add PepperX.SqliteGate.Dapper or PepperX.SqliteGate.EFCore — every package shares one gate per file, so they all queue together.</Description>
+    <PackageTags>sqlite;concurrency;database-is-locked;sqlite-busy;wal;single-writer;ado-net;microsoft-data-sqlite;csharp;dotnet;thread-safety;write-queue;retry</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/PepperX-Dev/SqliteGate/tree/main/src/PepperX.SqliteGate</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>icon.png</PackageIcon>
+
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PepperX.SqliteGate.Tests" />
+
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+  </ItemGroup>
+
+</Project>

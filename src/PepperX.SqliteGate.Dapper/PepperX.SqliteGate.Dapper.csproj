@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <PackageId>PepperX.SqliteGate.Dapper</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Amir Hossein Morady Pour</Authors>
+    <Description>Stop "database is locked" (SQLITE_BUSY) when using Dapper with SQLite. Dapper is a mapper, not a scheduler: it hands your command to a connection that has no idea another one is mid-write against the same file. This package gives you the Dapper methods you already write, as extensions on ISqliteGate instead of on a connection — Query* runs on a pool of reader connections that never waits for a writer, Execute* goes through a single-writer queue inside a transaction, so a retry after contention rolls back cleanly instead of applying half the work twice. The routing is decided by the method name, never by parsing your SQL. A thin adapter over PepperX.SqliteGate: the queue, WAL setup, pragmas, retries and metrics all live there, and the gate is keyed on the database file, so Dapper, raw ADO.NET and EF Core in the same process share one write queue rather than colliding with each other.</Description>
+    <PackageTags>dapper;sqlite;concurrency;database-is-locked;sqlite-busy;wal;single-writer;micro-orm;csharp;dotnet;thread-safety</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/PepperX-Dev/SqliteGate/tree/main/src/PepperX.SqliteGate.Dapper</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>icon.png</PackageIcon>
+
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PepperX.SqliteGate\PepperX.SqliteGate.csproj" />
+
+    <InternalsVisibleTo Include="PepperX.SqliteGate.Dapper.Tests" />
+
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.79" />
+  </ItemGroup>
+
+</Project>

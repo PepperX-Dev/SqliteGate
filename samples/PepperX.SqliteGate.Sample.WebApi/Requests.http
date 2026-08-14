@@ -1,0 +1,49 @@
+@SqliteGate_HostAddress = http://localhost:5185
+
+### Reset the sample data
+DELETE {{SqliteGate_HostAddress}}/api/gate/data
+
+### What is the gate doing right now?
+GET {{SqliteGate_HostAddress}}/api/gate
+
+### ---------- Writes: the same insert, one per package ----------
+
+### Insert through raw ADO.NET
+POST {{SqliteGate_HostAddress}}/api/todos/ado
+Content-Type: application/json
+
+{
+  "title": "Buy milk (ado)"
+}
+
+### Insert through Dapper
+POST {{SqliteGate_HostAddress}}/api/todos/dapper
+Content-Type: application/json
+
+{
+  "title": "Buy milk (dapper)"
+}
+
+### Insert through EF Core
+POST {{SqliteGate_HostAddress}}/api/todos/efcore
+Content-Type: application/json
+
+{
+  "title": "Buy milk (efcore)"
+}
+
+### ---------- Reads: never queued behind a writer ----------
+
+### List the most recent todos
+GET {{SqliteGate_HostAddress}}/api/todos?take=20
+
+### Totals, broken down by which package wrote each row
+GET {{SqliteGate_HostAddress}}/api/todos/count
+
+### ---------- The lost-update test ----------
+
+### Increment the counter (reads, then writes back one more)
+POST {{SqliteGate_HostAddress}}/api/counter/increment
+
+### Read the counter — after N concurrent increments this must be exactly N
+GET {{SqliteGate_HostAddress}}/api/counter

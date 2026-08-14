@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <PackageId>PepperX.SqliteGate.EFCore</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Amir Hossein Morady Pour</Authors>
+    <Description>Stop "database is locked" (SQLITE_BUSY) when SaveChangesAsync runs concurrently on SQLite. Every scoped DbContext gets its own connection, so under load they arrive together and SQLite lets exactly one of them write — a failure that looks random, worsens with traffic, and never reproduces on your laptop. Change UseSqlite to UseSqliteGate and EF Core writes queue behind a single write slot while LINQ queries keep reading freely on WAL. SaveChanges (both async and sync paths), Database.Migrate and Database.EnsureCreated are all gated, including the migration lock EF Core takes before it runs any command. Works with AddDbContextPool and leaves change tracking untouched. A thin adapter over PepperX.SqliteGate: the gate is keyed on the database file, so EF Core, Dapper and raw ADO.NET in the same process share one write queue rather than colliding with each other. See the README for the two cases that need an explicit gated transaction: ExecuteUpdate/ExecuteDelete, and read-modify-write.</Description>
+    <PackageTags>entity-framework-core;efcore;sqlite;concurrency;database-is-locked;sqlite-busy;wal;single-writer;savechanges;migrations;csharp;dotnet</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/PepperX-Dev/SqliteGate/tree/main/src/PepperX.SqliteGate.EFCore</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>icon.png</PackageIcon>
+
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PepperX.SqliteGate\PepperX.SqliteGate.csproj" />
+
+    <InternalsVisibleTo Include="PepperX.SqliteGate.EFCore.Tests" />
+
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
+  </ItemGroup>
+
+</Project>

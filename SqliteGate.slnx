@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/PepperX.SqliteGate/PepperX.SqliteGate.csproj" />
+    <Project Path="src/PepperX.SqliteGate.Dapper/PepperX.SqliteGate.Dapper.csproj" />
+    <Project Path="src/PepperX.SqliteGate.EFCore/PepperX.SqliteGate.EFCore.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PepperX.SqliteGate.Conformance/PepperX.SqliteGate.Conformance.csproj" />
+    <Project Path="tests/PepperX.SqliteGate.Tests/PepperX.SqliteGate.Tests.csproj" />
+    <Project Path="tests/PepperX.SqliteGate.Dapper.Tests/PepperX.SqliteGate.Dapper.Tests.csproj" />
+    <Project Path="tests/PepperX.SqliteGate.EFCore.Tests/PepperX.SqliteGate.EFCore.Tests.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/PepperX.SqliteGate.Sample.WebApi/PepperX.SqliteGate.Sample.WebApi.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,79 @@
+name: Pack and Publish NuGet
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+# id-token: write is what makes OIDC Trusted Publishing work. No NUGET_API_KEY secret is stored
+# anywhere in this repository — NuGet/login exchanges this workflow's short-lived OIDC token for a
+# temporary API key that expires shortly after the run.
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # A tag is a bad place to discover a broken build, so the full suite runs again here rather than
+  # trusting that the commit was green when it was pushed.
+  test:
+    name: Test before publishing
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore SqliteGate.slnx
+
+    - name: Build
+      run: dotnet build SqliteGate.slnx -c Release --no-restore
+
+    - name: Test
+      run: dotnet test SqliteGate.slnx -c Release --no-build --verbosity normal
+
+  publish:
+    name: Pack and publish
+    needs: [ test ]
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    # ContinuousIntegrationBuild makes the build deterministic and normalises source paths, which is
+    # what lets SourceLink point a debugger at the exact commit on GitHub. The .snupkg symbol
+    # packages are produced alongside by IncludeSymbols/SymbolPackageFormat in each csproj.
+    - name: Pack solution
+      run: dotnet pack SqliteGate.slnx -c Release -o ./nupkgs -p:ContinuousIntegrationBuild=true
+
+    - name: Authenticate with NuGet (Trusted Publishing)
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: AmirHosseinMp02
+
+    - name: Push to NuGet
+      run: >-
+        dotnet nuget push ./nupkgs/*.nupkg
+        --api-key ${{ steps.login.outputs.NUGET_API_KEY }}
+        --source https://api.nuget.org/v3/index.json
+        --skip-duplicate
+
+    - name: Upload packages to the workflow run
+      uses: actions/upload-artifact@v4
+      with:
+        name: nupkgs
+        path: ./nupkgs/*
